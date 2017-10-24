@@ -95,6 +95,16 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\DmxControlLib\DmxControlLib\DmxControlLib.csproj">
+      <Project>{402b66f2-a527-4f74-a7cb-7167bd81a05c}</Project>
+      <Name>DmxControlLib</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\DmxUserControlLib\DmxUserControlLib\DmxUserControlLib.csproj">
+      <Project>{1d24484a-a458-42c5-8ca0-233cee00f7e5}</Project>
+      <Name>DmxUserControlLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

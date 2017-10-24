@@ -1,12 +1,25 @@
-﻿<Window x:Class="WpfApplication2.MainWindow"
+﻿<Window
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfApplication2"
+        xmlns:DmxUserControlLib="clr-namespace:DmxUserControlLib;assembly=DmxUserControlLib" x:Class="WpfApplication2.MainWindow"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="DMXMD" Height="auto" Width="auto" Closing="Window_Closing">
+    <Grid Margin="0,0,-839,-297243">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+
+        <DmxUserControlLib:MatriceLedAPC40 x:Name="MatriceLed" Grid.Column="0" Grid.Row="0"  Height="400" Width="800" BT_click="MatriceLedAPC40_BT_click"/>
+        <DmxUserControlLib:APC40LedConf x:Name="ConfigLed" Grid.Column="1" Grid.Row="0" BT_Valid_Click="ConfigLed_BT_Valid_Click"/>
+
     </Grid>
 </Window>
