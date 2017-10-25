@@ -16,6 +16,8 @@ using DmxControlLib.Hardware;
 using DmxControlLib.Utility;
 using DmxUserControlLib;
 using Microsoft.Win32;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace WpfApplication2
 {
@@ -28,7 +30,7 @@ namespace WpfApplication2
         public APC40Mapping _APC40Map;
 
         public OpenFileDialog opendial;
-        public SaveFileDialog savedial;
+        public SaveFileDialog savedial; 
 
         public MainWindow()
         {
@@ -36,7 +38,9 @@ namespace WpfApplication2
             try
             {
                 _APC40 = new APC40();
-                _APC40Map = new APC40Mapping("new Mapping");
+                _APC40Map = new APC40Mapping("newMap");
+
+                MapName_TextBox.Text = _APC40Map.name;
 
                 _APC40.open();
 
@@ -45,12 +49,12 @@ namespace WpfApplication2
                 _APC40.LinkMapping(_APC40Map);
 
                 opendial = new OpenFileDialog();
-                opendial.Filter = "Mapping Setting (.map)|*.map";
+                opendial.Filter = "Mapping Setting (.APC40map)|*.APC40map";
 
 
                 savedial = new SaveFileDialog();
-                savedial.Filter = "Mapping Setting (.map)|*.map";
-                savedial.DefaultExt = ".map";
+                savedial.Filter = "Mapping Setting (.APC40map)|*.APC40map";
+                savedial.DefaultExt = ".APC40map";
                 savedial.AddExtension = true;
             }
             catch(Exception ex)
@@ -59,13 +63,9 @@ namespace WpfApplication2
             }
         }
 
-        private void MatriceLedAPC40_BT_click(object sender, BTClickEventArgs e)
-        {
-               
-        }
-
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            _APC40.resetLed();
             _APC40.close();
         }
 
@@ -82,9 +82,53 @@ namespace WpfApplication2
                     _APC40Map.RGBBT[ind].offColor = apcconf.OFFRGBColor;
                     _APC40Map.RGBBT[ind].onFlashing = apcconf.ONFlash;
                     _APC40Map.RGBBT[ind].offFlashing = apcconf.OFFFlash;
+                    _APC40Map.RGBBT[ind].Groupe = apcconf.Groupe;
                 }
 
                 _APC40.LinkMapping(_APC40Map);
+            }
+        }
+
+        private void New_Button_Click(object sender, RoutedEventArgs e)
+        {
+            _APC40Map = new APC40Mapping("newMap");
+            _APC40.LinkMapping(_APC40Map);
+
+            MapName_TextBox.Text = _APC40Map.name;
+        }
+
+        private void Open_button_Click(object sender, RoutedEventArgs e)
+        {
+            Nullable<bool> result = opendial.ShowDialog();
+
+            if(result == true)
+            {
+                BinaryFormatter format = new BinaryFormatter();
+                Stream STRE = opendial.OpenFile();
+
+                _APC40Map = (APC40Mapping)format.Deserialize(STRE);
+
+                _APC40.LinkMapping(_APC40Map);
+                MapName_TextBox.Text = _APC40Map.name;
+
+                STRE.Close();
+            }
+        }
+
+        private void Save_Button_Click(object sender, RoutedEventArgs e)
+        {
+            savedial.FileName = MapName_TextBox.Text;
+            Nullable<bool> result = savedial.ShowDialog();
+
+            if(result == true)
+            {
+                BinaryFormatter format = new BinaryFormatter();
+                Stream STRE = savedial.OpenFile();
+
+                format.Serialize(STRE, _APC40Map);
+
+                STRE.Close();
+
             }
         }
     }

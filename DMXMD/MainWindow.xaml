@@ -7,19 +7,33 @@
         xmlns:DmxUserControlLib="clr-namespace:DmxUserControlLib;assembly=DmxUserControlLib" x:Class="WpfApplication2.MainWindow"
         mc:Ignorable="d"
         Title="DMXMD" Height="auto" Width="auto" Closing="Window_Closing">
-    <Grid Margin="0,0,-839,-297243">
+    <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
-            <RowDefinition Height="1*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
-            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
 
-        <DmxUserControlLib:MatriceLedAPC40 x:Name="MatriceLed" Grid.Column="0" Grid.Row="0"  Height="400" Width="800" BT_click="MatriceLedAPC40_BT_click"/>
+        <DmxUserControlLib:MatriceLedAPC40 x:Name="MatriceLed" Grid.Column="0" Grid.Row="0"  Height="400" Width="800"/>
         <DmxUserControlLib:APC40LedConf x:Name="ConfigLed" Grid.Column="1" Grid.Row="0" BT_Valid_Click="ConfigLed_BT_Valid_Click"/>
+
+        <Grid Grid.Column="0" Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="MapName_TextBox" Grid.Column="0" Width="70" Margin="10"/>
+            <Button x:Name="New_Button" Grid.Column="1" Width="70" Content="New" Margin="10" Click="New_Button_Click"/>
+            <Button x:Name="Open_button" Grid.Column="2" Width="70" Content="Open" Margin="10" Click="Open_button_Click"/>
+            <Button x:Name="Save_Button" Grid.Column="3" Width="70" Content="Save" Margin="10" Click="Save_Button_Click"/>
+
+        </Grid>
 
     </Grid>
 </Window>
