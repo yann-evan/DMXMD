@@ -56,6 +56,7 @@ namespace WpfApplication2
                 savedial.Filter = "Mapping Setting (.APC40map)|*.APC40map";
                 savedial.DefaultExt = ".APC40map";
                 savedial.AddExtension = true;
+                
             }
             catch(Exception ex)
             {
@@ -78,11 +79,17 @@ namespace WpfApplication2
                 {
                     int ind = _APC40Map.RGBBT.FindIndex(x => x.ID == sel);
                     _APC40Map.RGBBT[ind].Type = apcconf.BTType;
-                    _APC40Map.RGBBT[ind].onColor = apcconf.ONRGBColor;
-                    _APC40Map.RGBBT[ind].offColor = apcconf.OFFRGBColor;
-                    _APC40Map.RGBBT[ind].onFlashing = apcconf.ONFlash;
-                    _APC40Map.RGBBT[ind].offFlashing = apcconf.OFFFlash;
                     _APC40Map.RGBBT[ind].Groupe = apcconf.Groupe;
+
+                    _APC40Map.RGBBT[ind].offprimaryColor = apcconf.OFFRGBPrimaryColor;
+                    _APC40Map.RGBBT[ind].offsecondaryColor = apcconf.OFFRGBSecondaryColor;
+                    _APC40Map.RGBBT[ind].offFlashingtype = apcconf.OFFBlinkingType;
+                    _APC40Map.RGBBT[ind].offFlashingspeed = apcconf.OFFBlinkingSpeed;
+
+                    _APC40Map.RGBBT[ind].onprimaryColor = apcconf.ONRGBPrimaryColor;
+                    _APC40Map.RGBBT[ind].onsecondaryColor = apcconf.ONRGBSecondaryColor;
+                    _APC40Map.RGBBT[ind].onFlashingtype = apcconf.ONBlinkingType;
+                    _APC40Map.RGBBT[ind].onFlashingspeed = apcconf.ONBlinkingSpeed;
                 }
 
                 _APC40.LinkMapping(_APC40Map);

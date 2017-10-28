@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfApplication2"
         xmlns:DmxUserControlLib="clr-namespace:DmxUserControlLib;assembly=DmxUserControlLib" x:Class="WpfApplication2.MainWindow"
         mc:Ignorable="d"
-        Title="DMXMD" Height="auto" Width="auto" Closing="Window_Closing">
+        Title="DMXMD" Height="500" Width="1100" Closing="Window_Closing">
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
