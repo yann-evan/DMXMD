@@ -56,6 +56,7 @@ namespace WpfApplication2
                 savedial.Filter = "Mapping Setting (.APC40map)|*.APC40map";
                 savedial.DefaultExt = ".APC40map";
                 savedial.AddExtension = true;
+
                 
             }
             catch(Exception ex)
