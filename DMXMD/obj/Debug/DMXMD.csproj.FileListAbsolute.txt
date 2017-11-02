@@ -20,3 +20,5 @@ C:\Users\dev\Desktop\DMX Project\Logiciel\DMXMD\DMXMD\obj\Debug\WpfApplication2.
 C:\Users\dev\Desktop\DMX Project\Logiciel\DMXMD\DMXMD\obj\Debug\DMXMD.csproj.GenerateResource.Cache
 C:\Users\dev\Desktop\DMX Project\Logiciel\DMXMD\DMXMD\obj\Debug\DMXMD.exe
 C:\Users\dev\Desktop\DMX Project\Logiciel\DMXMD\DMXMD\obj\Debug\DMXMD.pdb
+C:\Users\dev\Desktop\DMX Project\Logiciel\DMXMD\DMXMD\bin\Debug\DMXMD.exe.CodeAnalysisLog.xml
+C:\Users\dev\Desktop\DMX Project\Logiciel\DMXMD\DMXMD\bin\Debug\DMXMD.exe.lastcodeanalysissucceeded
