@@ -1,23 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using DmxControlLib.Hardware;
 using DmxControlLib.Utility;
 using DmxUserControlLib;
 using Microsoft.Win32;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Diagnostics;
 
 namespace WpfApplication2
 {
@@ -26,118 +15,224 @@ namespace WpfApplication2
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// APC40
+        /// </summary>
         public APC40 _APC40;
+
+        /// <summary>
+        /// Mapping de l'apc40
+        /// </summary>
         public APC40Mapping _APC40Map;
 
+        /// <summary>
+        /// Fenetre d'ouverture de fichier
+        /// </summary>
         public OpenFileDialog opendial;
+
+        /// <summary>
+        /// fenetre de sauvegarde de fichier
+        /// </summary>
         public SaveFileDialog savedial; 
 
+
+        /// <summary>
+        /// MAIN WIN
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
+
+            Log.open();
+            Log.writeLine(DateTime.Now.ToString());
+
+            bool connexionOK = false;
+            while(!connexionOK)
+            {
+                try
+                {
+                    _APC40 = new APC40();                                                   //Init APC40
+                    _APC40Map = new APC40Mapping("newMap");                                 //Init Mapping APC40
+
+                    MapName_TextBox.Text = _APC40Map.name;                                  //récuperation du nom de la sauvegarde
+
+                    _APC40.open();                                                          //Connexion de l'APC40
+
+                    _APC40.AnimatedStartAnimation();                                        //Animation de l'APC40
+
+                    _APC40.LinkMapping(_APC40Map);                                          //Link entre l'APC40 et le mapping
+
+                    opendial = new OpenFileDialog();                                        //Nouvelle fenetre d'ouverture de fichier
+                    opendial.Filter = "Mapping Setting (.APC40map)|*.APC40map";             //Afficher que les fichier .APC40map
+
+
+                    savedial = new SaveFileDialog();                                        //Nouvelle fenetre de sauvegarde de fichier
+                    savedial.Filter = "Mapping Setting (.APC40map)|*.APC40map";             //Afficher que les fichier .APC40map
+                    savedial.DefaultExt = ".APC40map";                                      //Extension du fichier
+                    savedial.AddExtension = true;                                           //Ajout de l'extension dans tout les cas
+
+                    connexionOK = true;
+                }
+                catch (Exception ex)
+                {
+                    //Si Erreur
+                    if (MessageBox.Show(ex.Message + "\nréessayer ?", "Erreur", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        connexionOK = false;
+                    }
+                    else
+                    {
+                        Environment.Exit(16);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Si Fermeture de la fenetre
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
             try
             {
-                _APC40 = new APC40();
-                _APC40Map = new APC40Mapping("newMap");
+                if (_APC40 != null)
+                {
+                    if (_APC40.IsOpen())
+                    {
+                        _APC40.resetLed(); //RAZ des leds
+                        _APC40.close();    //deconnexion de l'apc40
+                    }
+                }
+            }
+            catch
+            {
+                MessageBox.Show("Erreur pendant la fermeture");
+            }
+                    
+        }
 
-                MapName_TextBox.Text = _APC40Map.name;
+        /// <summary>
+        /// Si Appui sur le bouton Valide du module de configuration des leds
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ConfigLed_BT_Valid_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (sender is APC40LedConf)
+                {
+                    APC40LedConf apcconf = sender as APC40LedConf;  //Recuperation de toute les information du module de configuration des leds
+                    foreach (int sel in MatriceLed.SelectedBT)      //tri des info
+                    {
+                        int ind = _APC40Map.RGBBT.FindIndex(x => x.ID == sel);
+                        _APC40Map.RGBBT[ind].Type = apcconf.BTType;
+                        _APC40Map.RGBBT[ind].Groupe = apcconf.Groupe;
 
-                _APC40.open();
+                        _APC40Map.RGBBT[ind].offprimaryColor = apcconf.OFFRGBPrimaryColor;
+                        _APC40Map.RGBBT[ind].offsecondaryColor = apcconf.OFFRGBSecondaryColor;
+                        _APC40Map.RGBBT[ind].offFlashingtype = apcconf.OFFBlinkingType;
+                        _APC40Map.RGBBT[ind].offFlashingspeed = apcconf.OFFBlinkingSpeed;
 
-                _APC40.AnimatedStartAnimation();
+                        _APC40Map.RGBBT[ind].onprimaryColor = apcconf.ONRGBPrimaryColor;
+                        _APC40Map.RGBBT[ind].onsecondaryColor = apcconf.ONRGBSecondaryColor;
+                        _APC40Map.RGBBT[ind].onFlashingtype = apcconf.ONBlinkingType;
+                        _APC40Map.RGBBT[ind].onFlashingspeed = apcconf.ONBlinkingSpeed;
+                    }
 
-                _APC40.LinkMapping(_APC40Map);
-
-                opendial = new OpenFileDialog();
-                opendial.Filter = "Mapping Setting (.APC40map)|*.APC40map";
-
-
-                savedial = new SaveFileDialog();
-                savedial.Filter = "Mapping Setting (.APC40map)|*.APC40map";
-                savedial.DefaultExt = ".APC40map";
-                savedial.AddExtension = true;
-
-                
+                    _APC40.LinkMapping(_APC40Map);  //envoi vers le mapping de l'apc40
+                }
             }
             catch(Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                MessageBox.Show("Impossible de Communiquer avec l'APC40\nL'application va s'arreter");
+                Environment.Exit(15);
             }
+            
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
-        {
-            _APC40.resetLed();
-            _APC40.close();
-        }
-
-        private void ConfigLed_BT_Valid_Click(object sender, EventArgs e)
-        {
-            if(sender is APC40LedConf)
-            {
-                APC40LedConf apcconf = sender as APC40LedConf;
-                foreach(int sel in MatriceLed.SelectedBT)
-                {
-                    int ind = _APC40Map.RGBBT.FindIndex(x => x.ID == sel);
-                    _APC40Map.RGBBT[ind].Type = apcconf.BTType;
-                    _APC40Map.RGBBT[ind].Groupe = apcconf.Groupe;
-
-                    _APC40Map.RGBBT[ind].offprimaryColor = apcconf.OFFRGBPrimaryColor;
-                    _APC40Map.RGBBT[ind].offsecondaryColor = apcconf.OFFRGBSecondaryColor;
-                    _APC40Map.RGBBT[ind].offFlashingtype = apcconf.OFFBlinkingType;
-                    _APC40Map.RGBBT[ind].offFlashingspeed = apcconf.OFFBlinkingSpeed;
-
-                    _APC40Map.RGBBT[ind].onprimaryColor = apcconf.ONRGBPrimaryColor;
-                    _APC40Map.RGBBT[ind].onsecondaryColor = apcconf.ONRGBSecondaryColor;
-                    _APC40Map.RGBBT[ind].onFlashingtype = apcconf.ONBlinkingType;
-                    _APC40Map.RGBBT[ind].onFlashingspeed = apcconf.ONBlinkingSpeed;
-                }
-
-                _APC40.LinkMapping(_APC40Map);
-            }
-        }
-
+        /// <summary>
+        /// Si appui sur le bouton de nouveau mapping
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void New_Button_Click(object sender, RoutedEventArgs e)
         {
-            _APC40Map = new APC40Mapping("newMap");
-            _APC40.LinkMapping(_APC40Map);
+            try
+            {
+                _APC40Map = new APC40Mapping("newMap");
+                _APC40.LinkMapping(_APC40Map);
 
-            MapName_TextBox.Text = _APC40Map.name;
+                MapName_TextBox.Text = _APC40Map.name;
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erreur pendant la creation d'un nouveau mapping :\n" + ex.Message + "\nveuillez réesayer");
+            }
         }
 
+        /// <summary>
+        /// Si appui sur le nouton de'ouverture d'un mapping
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Open_button_Click(object sender, RoutedEventArgs e)
         {
-            Nullable<bool> result = opendial.ShowDialog();
-
-            if(result == true)
+            try
             {
-                BinaryFormatter format = new BinaryFormatter();
-                Stream STRE = opendial.OpenFile();
+                Nullable<bool> result = opendial.ShowDialog();
 
-                _APC40Map = (APC40Mapping)format.Deserialize(STRE);
+                if (result == true)
+                {
+                    BinaryFormatter format = new BinaryFormatter();
+                    Stream STRE = opendial.OpenFile();
 
-                _APC40.LinkMapping(_APC40Map);
-                MapName_TextBox.Text = _APC40Map.name;
+                    _APC40Map = (APC40Mapping)format.Deserialize(STRE);
 
-                STRE.Close();
+                    _APC40.LinkMapping(_APC40Map);
+                    MapName_TextBox.Text = _APC40Map.name;
+
+                    STRE.Close();
+                }
             }
+            catch(Exception ex)
+            {
+                MessageBox.Show("Erreur pendant l'ouverture d'un nouveau mapping :\n" + ex.Message + "\nveuillez réesayer");
+            }
+            
         }
 
+        /// <summary>
+        /// Si appui sur le bouton de sauvegarde d'un mapping
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Save_Button_Click(object sender, RoutedEventArgs e)
         {
-            savedial.FileName = MapName_TextBox.Text;
-            Nullable<bool> result = savedial.ShowDialog();
-
-            if(result == true)
+            try
             {
-                BinaryFormatter format = new BinaryFormatter();
-                Stream STRE = savedial.OpenFile();
+                savedial.FileName = MapName_TextBox.Text;
+                Nullable<bool> result = savedial.ShowDialog();
 
-                format.Serialize(STRE, _APC40Map);
+                if (result == true)
+                {
+                    BinaryFormatter format = new BinaryFormatter();
+                    Stream STRE = savedial.OpenFile();
 
-                STRE.Close();
+                    format.Serialize(STRE, _APC40Map);
 
+                    STRE.Close();
+
+                }
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Erreur pendant l'ouverture d'un nouveau mapping :\n" + ex.Message + "\nveuillez réesayer");
+            }
+            
         }
     }
 }
+ 
